@@ -1,132 +1,82 @@
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-public class AESEncryption
-{
-    public static void Main(string[] args)
-    {
-        string originalText = "thisisasecretmessage";
+namespace Cryptography_AES {
+    public class AESEncryption {
+        public static void Main() {
+            string originalText = "thisisasecretmessage";
 
-        Console.WriteLine("Enter encryption mode (ECB, CBC, CFB):");
-        string? mode = Console.ReadLine()?.ToUpper();
+            Console.WriteLine("Enter encryption mode (ECB, CBC, CFB):");
+            string? modeInput = Console.ReadLine()?.ToUpper();
 
-        using (Aes aesAlg = Aes.Create())
-        {
+            CipherMode mode = modeInput switch {
+                "ECB" => CipherMode.ECB,
+                "CBC" => CipherMode.CBC,
+                "CFB" => CipherMode.CFB,
+                _ => CipherMode.CBC
+            };
+
+            if (modeInput != "ECB" && modeInput != "CBC" && modeInput != "CFB")
+                Console.WriteLine("Invalid mode. Defaulting to CBC.");
+
+            Console.WriteLine("Enter key size (128, 192, 256):");
+            if (!int.TryParse(Console.ReadLine(), out int keySize) || (keySize != 128 && keySize != 192 && keySize != 256)) {
+                Console.WriteLine("Invalid key size. Defaulting to 256 bits.");
+                keySize = 256;
+            }
+
+            using Aes aesAlg = Aes.Create();
+            aesAlg.KeySize = keySize;
+            aesAlg.GenerateKey();
+            aesAlg.GenerateIV();
+
             byte[] key = aesAlg.Key;
             byte[] iv = aesAlg.IV;
 
-            AESEncryption aesEncryption = new AESEncryption();
+            byte[] encryptedText = Encrypt(originalText, key, iv, mode);
+            string decryptedText = Decrypt(encryptedText, key, iv, mode);
 
-            byte[] encryptedText = aesEncryption.Encrypt(originalText, key, iv, mode);
-
-            byte[] cipherBytes = encryptedText;
-
-            string decryptedText = aesEncryption.Decrypt(cipherBytes, key, iv, mode);
-            Console.WriteLine("Decrypted Text: " + decryptedText);
-
-            if (originalText == decryptedText)
-            {
-                Console.WriteLine("The original text and decrypted text are the same.");
-            }
-            else
-            {
-                Console.WriteLine("The original text and decrypted text are different.");
-            }
+            Console.WriteLine($"Encrypted Text (Base64): {Convert.ToBase64String(encryptedText)}");
+            Console.WriteLine($"Decrypted Text: {decryptedText}");
+            Console.WriteLine(originalText == decryptedText ? "Success: Text matches!" : "Error: Mismatch!");
         }
-    }
 
-    public byte[] Encrypt(string plainText, byte[] key, byte[] IV, string mode)
-    {
-        byte[] encrypted;
-
-        using (Aes aes = Aes.Create())
-        {
+        public static byte[] Encrypt(string plainText, byte[] key, byte[] IV, CipherMode mode) {
+            using Aes aes = Aes.Create();
             aes.Key = key;
+            aes.Mode = mode;
+            aes.Padding = PaddingMode.PKCS7;
 
-            if (mode == "ECB")
-            {
-                aes.Mode = CipherMode.ECB;
-                aes.IV = new byte[16];
-            }
-            else if (mode == "CBC")
-            {
-                aes.Mode = CipherMode.CBC;
+            if (mode != CipherMode.ECB)
                 aes.IV = IV;
-            }
-            else if (mode == "CFB")
-            {
-                aes.Mode = CipherMode.CFB;
-                aes.IV = IV;
-            }
-            else
-            {
-                Console.WriteLine("using usual AES");
-            }
 
-            ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-            using (MemoryStream msEncrypt = new MemoryStream())
-            {
-                using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                {
-                    using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                    {
-                        swEncrypt.Write(plainText);
-                    }
-                    encrypted = msEncrypt.ToArray();
-                }
-            }
+            using ICryptoTransform encryptor = aes.CreateEncryptor();
+            using MemoryStream ms = new();
+            using CryptoStream cs = new(ms, encryptor, CryptoStreamMode.Write);
+            using StreamWriter sw = new(cs);
+            sw.Write(plainText);
+            sw.Flush();
+            cs.FlushFinalBlock();
+            return ms.ToArray();
         }
-        return encrypted;
-    }
 
-    public string Decrypt(byte[] cipherText, byte[] key, byte[] IV, string mode)
-    {
-        string decrypted;
-        using (Aes aes = Aes.Create())
-        {
+        public static string Decrypt(byte[] cipherText, byte[] key, byte[] IV, CipherMode mode) {
+            using Aes aes = Aes.Create();
             aes.Key = key;
+            aes.Mode = mode;
+            aes.Padding = PaddingMode.PKCS7;
 
-            if (mode == "ECB")
-            {
-                aes.Mode = CipherMode.ECB;
-            }
-            else if (mode == "CBC")
-            {
-                aes.Mode = CipherMode.CBC;
+            if (mode != CipherMode.ECB)
                 aes.IV = IV;
-            }
-            else if (mode == "CFB")
-            {
-                aes.Mode = CipherMode.CFB;
-                aes.IV = IV;
-            }
-            else
-            {
-                Console.WriteLine("Invalid mode, using AES CBC");
-                aes.Mode = CipherMode.CBC;
-                aes.IV = IV;
-            }
-            ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-            using (MemoryStream msDecrypt = new MemoryStream(cipherText))
-            {
-                using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                {
-                    using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                    {
-                        decrypted = srDecrypt.ReadToEnd();
-                    }
-                }
-            }
+            using ICryptoTransform decryptor = aes.CreateDecryptor();
+            using MemoryStream ms = new(cipherText);
+            using CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Read);
+            using StreamReader sr = new(cs);
+            return sr.ReadToEnd();
         }
-        return decrypted;
-    }
-
-    public static byte[] HexStringToByteArray(string hex)
-    {
-        return Enumerable.Range(0, hex.Length / 2)
-            .Select(x => Convert.ToByte(hex.Substring(x * 2, 2), 16))
-            .ToArray();
     }
 }
