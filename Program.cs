@@ -22,8 +22,9 @@ namespace Cryptography_AES {
 
             AESMode aes = modeInput switch {
                 "ECB" => new AES_ECB(key),
-                "CBC" => new AES_ECB(key),
-                _ => new AES_ECB(key)
+                "CBC" => new AES_CBC(key, iv),
+                "CFB" => new AES_CFB(key, iv),
+                _ => new AES_CBC(key, iv)
             };
 
             byte[] encryptedText = aes.Encrypt(Encoding.UTF8.GetBytes(originalText));

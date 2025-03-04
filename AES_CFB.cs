@@ -1,25 +1,42 @@
 ﻿namespace Cryptography_AES {
     public class AES_CFB : AESMode {
-        private byte[] iv;
-
+        private readonly byte[] iv;
         public AES_CFB(byte[] key, byte[] iv) : base(key) {
-            if (iv.Length != BlockSize) throw new ArgumentException("Invalid IV size.");
+            if (iv == null || iv.Length != BlockSize) throw new ArgumentException("Invalid IV size");
             this.iv = iv;
         }
 
-        protected override byte[] EncryptBlock(byte[] block) {
-            byte[] encrypted = aes.Encrypt(iv);
-            for (int i = 0; i < BlockSize; i++) block[i] ^= encrypted[i];
-            iv = block;
-            return block;
+        public override byte[] Encrypt(byte[] plaintext) {
+            byte[] ciphertext = new byte[plaintext.Length];
+            byte[] prevBlock = iv;
+
+            for (int i = 0; i < plaintext.Length; i += BlockSize) {
+                byte[] encryptedBlock = aes.Encrypt(prevBlock);
+                byte[] block = new byte[BlockSize];
+                int bytesToProcess = Math.Min(BlockSize, plaintext.Length - i);
+                Array.Copy(plaintext, i, block, 0, bytesToProcess);
+                byte[] cipherBlock = Xor(block, encryptedBlock);
+                Array.Copy(cipherBlock, 0, ciphertext, i, bytesToProcess);
+                prevBlock = cipherBlock;
+            }
+            return ciphertext;
         }
 
-        protected override byte[] DecryptBlock(byte[] block) {
-            byte[] encrypted = aes.Encrypt(iv);
-            byte[] decrypted = new byte[BlockSize];
-            for (int i = 0; i < BlockSize; i++) decrypted[i] = (byte)(block[i] ^ encrypted[i]);
-            iv = block;
-            return decrypted;
+        public override byte[] Decrypt(byte[] ciphertext) {
+            byte[] plaintext = new byte[ciphertext.Length];
+            byte[] prevBlock = iv;
+
+            for (int i = 0; i < ciphertext.Length; i += BlockSize) {
+                byte[] encryptedBlock = aes.Encrypt(prevBlock);
+                byte[] cipherBlock = new byte[BlockSize];
+                int bytesToProcess = Math.Min(BlockSize, ciphertext.Length - i);
+                Array.Copy(ciphertext, i, cipherBlock, 0, bytesToProcess);
+                byte[] decryptedBlock = Xor(cipherBlock, encryptedBlock);
+                Array.Copy(decryptedBlock, 0, plaintext, i, bytesToProcess);
+                prevBlock = cipherBlock;
+            }
+            return plaintext;
         }
     }
+
 }
