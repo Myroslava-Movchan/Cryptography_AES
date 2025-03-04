@@ -33,11 +33,12 @@ namespace Cryptography_AES {
             aesAlg.GenerateKey();
             aesAlg.GenerateIV();
 
-            byte[] key = aesAlg.Key;
+            byte[] key = RandKeyGen.GenerateKey(keySize);
             byte[] iv = aesAlg.IV;
 
-            byte[] encryptedText = Encrypt(originalText, key, iv, mode);
-            string decryptedText = Decrypt(encryptedText, key, iv, mode);
+            AES_ECB aesEcb = new AES_ECB(key);
+            byte[] encryptedText = aesEcb.Encrypt(Encoding.UTF8.GetBytes(originalText));
+            string decryptedText = Encoding.UTF8.GetString(aesEcb.Decrypt(encryptedText));
 
             Console.WriteLine($"Encrypted Text (Base64): {Convert.ToBase64String(encryptedText)}");
             Console.WriteLine($"Decrypted Text: {decryptedText}");

@@ -2,7 +2,7 @@
 
 namespace Cryptography_AES
 {
-    public class AESCustom {
+    public class AES {
         private readonly int Nr; // Rounds (10 for 128, 12 for 192, 14 for 256)
         private readonly int Nk; // Key length (words)
         private readonly int Nb = 4; // Block size (words)
@@ -53,7 +53,7 @@ namespace Cryptography_AES
             0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D
         ];
 
-        public AESCustom(byte[] key) {
+        public AES(byte[] key) {
             Nk = key.Length / 4; // 32-bit-words length
             Nr = Nk + 6; // Rounds
             expandedKey = new byte[Nb * (Nr + 1) * 4];
