@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Cryptography_AES
+﻿namespace Cryptography_AES
 {
     public class AES {
         private readonly int Nr; // Rounds (10 for 128, 12 for 192, 14 for 256)
