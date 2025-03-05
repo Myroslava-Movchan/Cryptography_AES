@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AES_NIST_TestVectors", "AES_NIST_TestVectors\AES_NIST_TestVectors.csproj", "{D25FDA1E-44B8-E860-4D3D-D1633AB9A593}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptography_AES", "Cryptography_AES\Cryptography_AES.csproj", "{A99F0701-5CB6-805E-0C0F-358F562138CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D25FDA1E-44B8-E860-4D3D-D1633AB9A593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D25FDA1E-44B8-E860-4D3D-D1633AB9A593}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D25FDA1E-44B8-E860-4D3D-D1633AB9A593}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D25FDA1E-44B8-E860-4D3D-D1633AB9A593}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A99F0701-5CB6-805E-0C0F-358F562138CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A99F0701-5CB6-805E-0C0F-358F562138CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A99F0701-5CB6-805E-0C0F-358F562138CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A99F0701-5CB6-805E-0C0F-358F562138CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {406D442D-922C-4FB6-9642-8947BF63E50F}
+	EndGlobalSection
+EndGlobal
