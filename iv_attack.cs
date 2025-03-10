@@ -66,7 +66,15 @@ namespace Cryptography_AES
             }
 
             // convert texts to string to make them readable
-            string decodedPlaintext = Convert.ToBase64String(plaintext);
+            string decodedPlaintext;
+            try
+            {
+                decodedPlaintext = Encoding.UTF8.GetString(plaintext).Trim();
+            }
+            catch
+            {
+                decodedPlaintext = BitConverter.ToString(plaintext);
+            }
             Console.WriteLine($"Recovered: {decodedPlaintext}");
         }
 
