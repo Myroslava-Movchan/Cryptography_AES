@@ -38,6 +38,12 @@ namespace Cryptography_AES {
             }
             return Unpad(plaintext);
         }
+        
+        public byte[] DecryptSingleBlock(byte[] ciphertextBlock)
+        {
+            byte[] decryptedBlock = aes.Decrypt(ciphertextBlock);
+            return decryptedBlock;
+        }
     }
 
 }
