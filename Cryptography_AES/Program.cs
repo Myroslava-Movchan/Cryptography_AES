@@ -2,7 +2,7 @@
 
 namespace Cryptography_AES {
     public class AESEncryption {
-        public static void Main() {
+        public static void Main2() {
             string originalText = "thisisasecretmessage";
 
             Console.WriteLine("Enter encryption mode (ECB, CBC, CFB):");
